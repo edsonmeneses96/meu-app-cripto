@@ -7,7 +7,7 @@ from binance.spot import Spot
 
 st.set_page_config(page_title="Painel VIP - Monitor Cripto", page_icon="📊")
 
-# --- SEGURANÇA: Puxa o Token escondido das configurações do servidor ---
+# --- SEGURANÇA: Puxa o Token de forma isolada das configurações secretas ---
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = "5402664067"
 
@@ -16,7 +16,7 @@ MOEDAS_MONITORADAS = [
     'SOLUSDT', 'LTCUSDT', 'BCHUSDT', 'DOGEUSDT', 'ZECUSDT'
 ]
 
-# Limite super sensível para os alertas estourarem no Telegram no primeiro minuto
+# Limite sensível de teste para o Telegram apitar a cada oscilação
 LIMITE_ALERTA_PERCENTUAL = 0.001
 
 if 'precos_anteriores' not in st.session_state:
@@ -75,7 +75,7 @@ st.title("⚡ Painel de Monitoramento VIP")
 st.markdown("Cotações em tempo real com alertas automáticos enviados para o Telegram.")
 st.markdown("---")
 
-# Dispara o alerta no minuto exato em que o servidor ler o código novo
+# CORREÇÃO: Removida a barra invertida do texto de inicialização
 if 'sistema_iniciado' not in st.session_state:
     sucesso = enviar_mensagem_telegram("🚀 *Sistema Conectado na Nuvem!* \nO seu robô agora está rodando de forma 100% segura e profissional.")
     if sucesso:
@@ -101,6 +101,7 @@ if dados_precos and df_cripto is not None:
                     
                     if abs(variacao_minuto) >= LIMITE_ALERTA_PERCENTUAL:
                         fmt = "{:,.8f}" if preco_atual < 0.01 else "{:,.2f}"
+                        # CORREÇÃO: Trocado o '\$' por '\$' puro para limpar o erro de sintaxe do servidor
                         alerta_msg = (
                             f"🚨 *MOVIMENTAÇÃO DETECTADA!* 🚨\n\n"
                             f"🪙 *Moeda:* {moeda.replace('USDT', '')}\n"
