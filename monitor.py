@@ -8,7 +8,7 @@ from binance.spot import Spot
 
 st.set_page_config(page_title="Painel VIP - Monitor Cripto", page_icon="📊")
 
-# --- SEGURANÇA: Puxa o Token de forma isolada das configurações secretas ---
+# --- SEGURANÇA MÁXIMA: Puxa o Token direto do ambiente oculto do Render ---
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = "5402664067"
 
@@ -76,10 +76,10 @@ st.title("⚡ Painel de Monitoramento VIP")
 st.markdown("Cotações em tempo real com alertas automáticos enviados para o Telegram.")
 st.markdown("---")
 
-# Mensagem limpa de inicialização
+# Mensagem limpa de inicialização enviada de forma segura
 if 'sistema_iniciado' not in st.session_state:
     sucesso = enviar_mensagem_telegram("🚀 *Sistema Conectado na Nuvem!* \nO seu robô agora está rodando de forma 100% segura e profissional.")
-    if success:
+    if sucesso:
         st.session_state.sistema_iniciado = True
 
 placeholder = st.empty()
@@ -121,7 +121,7 @@ if dados_precos and df_cripto is not None:
                     return 'color: #ff3333; font-weight: bold;'
                 return 'color: white;'
 
-            col_esq, col_centro, col_dir = st.columns()
+            col_esq, col_centro, col_dir = st.columns([1, 3, 1])
             with col_centro:
                 st.dataframe(
                     df_cripto.style.applymap(aplicar_cores, subset=['Variação (24h)']),
