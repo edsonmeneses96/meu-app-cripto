@@ -1,14 +1,14 @@
+import os
 import time
 import requests
 import pandas as pd
 import streamlit as st
 from binance.spot import Spot
 
-# Configuração da página web limpa e centralizada
 st.set_page_config(page_title="Painel VIP - Monitor Cripto", page_icon="📊")
 
-# --- CONFIGURAÇÕES DO TELEGRAM ---
-TELEGRAM_TOKEN = "8953605979:AAFC71l9tvXkb-iFJZWeRo5Ga3rWB2DhAoo"
+# --- SEGURANÇA: Puxa o Token escondido das configurações do servidor ---
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = "5402664067"
 
 MOEDAS_MONITORADAS = [
@@ -16,17 +16,15 @@ MOEDAS_MONITORADAS = [
     'SOLUSDT', 'LTCUSDT', 'BCHUSDT', 'DOGEUSDT', 'ZECUSDT'
 ]
 
-# Deixamos o limite super sensível para você ver os alertas pipocarem no celular a cada minuto
+# Limite super sensível para os alertas estourarem no Telegram no primeiro minuto
 LIMITE_ALERTA_PERCENTUAL = 0.001
 
-# Inicializa as memórias de histórico e controle de conexões do Streamlit
 if 'precos_anteriores' not in st.session_state:
     st.session_state.precos_anteriores = {}
-if 'sistema_iniciado' not in st.session_state:
-    st.session_state.sistema_iniciado = False
 
 def enviar_mensagem_telegram(mensagem):
-    """Envia as notificações de forma direta e independente do loop visual."""
+    if not TELEGRAM_TOKEN:
+        return False
     url = f"https://telegram.org{TELEGRAM_TOKEN}/sendMessage"
     payload = {
         "chat_id": str(TELEGRAM_CHAT_ID),
@@ -34,18 +32,15 @@ def enviar_mensagem_telegram(mensagem):
         "parse_mode": "Markdown"
     }
     try:
-        # Usamos uma requisição rápida para o Telegram não travar a renderização do site
         resposta = requests.post(url, json=payload, timeout=5)
         return resposta.status_code == 200
     except Exception:
         return False
 
 def puxar_dados_binance():
-    """Conecta com a Binance para obter os dados de mercado limpos e formatados."""
     try:
         cliente = Spot()
         dados = cliente.ticker_24hr()
-        
         linhas = []
         precos_dict = {}
         
@@ -76,24 +71,21 @@ def puxar_dados_binance():
     except Exception:
         return None, None
 
-# --- DESIGN DO PAINEL WEB COMERCIAL ---
 st.title("⚡ Painel de Monitoramento VIP")
 st.markdown("Cotações em tempo real com alertas automáticos enviados para o Telegram.")
 st.markdown("---")
 
-# CORREÇÃO: Dispara a mensagem de teste de forma isolada na inicialização do servidor
-if not st.session_state.sistema_iniciado:
-    sucesso = enviar_mensagem_telegram("🚀 *Sistema Tudo-em-Um Conectado!* \nSeu robô está monitorando o mercado e o envio em segundo plano está ativo.")
+# Dispara o alerta no minuto exato em que o servidor ler o código novo
+if 'sistema_iniciado' not in st.session_state:
+    sucesso = enviar_mensagem_telegram("🚀 *Sistema Conectado na Nuvem!* \nO seu robô agora está rodando de forma 100% segura e profissional.")
     if sucesso:
         st.session_state.sistema_iniciado = True
 
 placeholder = st.empty()
-
 df_cripto, dados_precos = puxar_dados_binance()
 
 if dados_precos and df_cripto is not None:
     with placeholder.container():
-        # Indicadores de topo compactos
         col1, col2, col3 = st.columns(3)
         col1.metric("Ativos Monitorados", f"{len(MOEDAS_MONITORADAS)} Moedas")
         col2.metric("Status do Bot", "Conectado e Ativo 🤖")
@@ -101,7 +93,6 @@ if dados_precos and df_cripto is not None:
         
         st.markdown("###")
         
-        # PROCESSAMENTO E DISPARO REAL DE ALERTAS PARA O TELEGRAM
         for moeda, preco_atual in dados_precos.items():
             if moeda in st.session_state.precos_anteriores:
                 preco_antigo = st.session_state.precos_anteriores[moeda]
@@ -119,10 +110,8 @@ if dados_precos and df_cripto is not None:
                         )
                         enviar_mensagem_telegram(alerta_msg)
             
-            # Alimenta a memória a cada minuto para rastrear o próximo movimento
             st.session_state.precos_anteriores[moeda] = preco_atual
 
-        # TABELA COMERCIAL SIMPLIFICADA E ALINHADA CENTRADA
         if not df_cripto.empty:
             def aplicar_cores(val):
                 if val > 0:
@@ -131,8 +120,7 @@ if dados_precos and df_cripto is not None:
                     return 'color: #ff3333; font-weight: bold;'
                 return 'color: white;'
 
-            col_esq, col_centro, col_dir = st.columns([1, 4, 1])
-            
+            col_esq, col_centro, col_dir = st.columns()
             with col_centro:
                 st.dataframe(
                     df_cripto.style.applymap(aplicar_cores, subset=['Variação (24h)']),
@@ -146,6 +134,5 @@ if dados_precos and df_cripto is not None:
                     hide_index=True
                 )
 
-# Atualização contínua a cada 60 segundos
 time.sleep(60)
 st.rerun()
