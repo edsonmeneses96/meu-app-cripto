@@ -1,4 +1,3 @@
-
 import os
 import time
 import requests
@@ -8,7 +7,7 @@ from binance.spot import Spot
 
 st.set_page_config(page_title="Painel VIP - Monitor Cripto", page_icon="📊")
 
-# --- SEGURANÇA MÁXIMA: Puxa o Token direto do ambiente oculto do Render ---
+# --- SEGURANÇA MÁXIMA ---
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = "5402664067"
 
@@ -17,7 +16,6 @@ MOEDAS_MONITORADAS = [
     'SOLUSDT', 'LTCUSDT', 'BCHUSDT', 'DOGEUSDT', 'ZECUSDT'
 ]
 
-# Limite sensível de teste para o Telegram apitar a cada oscilação
 LIMITE_ALERTA_PERCENTUAL = 0.001
 
 if 'precos_anteriores' not in st.session_state:
@@ -76,9 +74,8 @@ st.title("⚡ Painel de Monitoramento VIP")
 st.markdown("Cotações em tempo real com alertas automáticos enviados para o Telegram.")
 st.markdown("---")
 
-# Mensagem limpa de inicialização enviada de forma segura
 if 'sistema_iniciado' not in st.session_state:
-    sucesso = enviar_mensagem_telegram("🚀 *Sistema Conectado na Nuvem!* \nO seu robô agora está rodando de forma 100% segura e profissional.")
+    sucesso = enviar_mensagem_telegram("🚀 *Sistema Conectado na Nuvem!* \nO seu robo agora esta rodando de forma 100% segura.")
     if sucesso:
         st.session_state.sistema_iniciado = True
 
@@ -105,9 +102,9 @@ if dados_precos and df_cripto is not None:
                         alerta_msg = (
                             f"🚨 *MOVIMENTAÇÃO DETECTADA!* 🚨\n\n"
                             f"🪙 *Moeda:* {moeda.replace('USDT', '')}\n"
-                            f"📊 *Variação:* `{variacao_minuto:.4f}%` no minuto\n"
-                            f"💰 *Preço Atual:* \$ {fmt.format(preco_atual)}\n"
-                            f"📉 *Preço Anterior:* \$ {fmt.format(preco_antigo)}"
+                            f"📊 *Variação:* {variacao_minuto:.4f}% no minuto\n"
+                            f"💰 *Preço Atual:* {fmt.format(preco_atual)} USD\n"
+                            f"📉 *Preço Anterior:* {fmt.format(preco_antigo)} USD"
                         )
                         enviar_mensagem_telegram(alerta_msg)
             
@@ -121,7 +118,7 @@ if dados_precos and df_cripto is not None:
                     return 'color: #ff3333; font-weight: bold;'
                 return 'color: white;'
 
-            col_esq, col_centro, col_dir = st.columns([1, 3, 1])
+            col_esq, col_centro, col_dir = st.columns([1, 4, 1])
             with col_centro:
                 st.dataframe(
                     df_cripto.style.applymap(aplicar_cores, subset=['Variação (24h)']),
