@@ -1,3 +1,4 @@
+
 import os
 import time
 import requests
@@ -75,10 +76,10 @@ st.title("⚡ Painel de Monitoramento VIP")
 st.markdown("Cotações em tempo real com alertas automáticos enviados para o Telegram.")
 st.markdown("---")
 
-# CORREÇÃO: Removida a barra invertida do texto de inicialização
+# Mensagem limpa de inicialização
 if 'sistema_iniciado' not in st.session_state:
     sucesso = enviar_mensagem_telegram("🚀 *Sistema Conectado na Nuvem!* \nO seu robô agora está rodando de forma 100% segura e profissional.")
-    if sucesso:
+    if success:
         st.session_state.sistema_iniciado = True
 
 placeholder = st.empty()
@@ -101,7 +102,6 @@ if dados_precos and df_cripto is not None:
                     
                     if abs(variacao_minuto) >= LIMITE_ALERTA_PERCENTUAL:
                         fmt = "{:,.8f}" if preco_atual < 0.01 else "{:,.2f}"
-                        # CORREÇÃO: Trocado o '\$' por '\$' puro para limpar o erro de sintaxe do servidor
                         alerta_msg = (
                             f"🚨 *MOVIMENTAÇÃO DETECTADA!* 🚨\n\n"
                             f"🪙 *Moeda:* {moeda.replace('USDT', '')}\n"
