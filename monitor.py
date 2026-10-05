@@ -24,11 +24,10 @@ if 'precos_anteriores' not in st.session_state:
 def enviar_mensagem_telegram(mensagem):
     if not TELEGRAM_TOKEN:
         return False
-    # CORREÇÃO: Ajustado o link oficial da API do Telegram para o robô disparar
     url = f"https://telegram.org{TELEGRAM_TOKEN}/sendMessage"
     payload = {
         "chat_id": str(TELEGRAM_CHAT_ID),
-        "text": message,
+        "text": mensagem,
         "parse_mode": "Markdown"
     }
     try:
@@ -119,7 +118,7 @@ if dados_precos and df_cripto is not None:
                     return 'color: #ff3333; font-weight: bold;'
                 return 'color: white;'
 
-            col_esq, col_centro, col_dir = st.columns([1, 4, 1])
+            col_esq, col_centro, col_dir = st.columns()
             with col_centro:
                 st.dataframe(
                     df_cripto.style.applymap(aplicar_cores, subset=['Variação (24h)']),
