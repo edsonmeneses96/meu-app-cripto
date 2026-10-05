@@ -16,6 +16,7 @@ MOEDAS_MONITORADAS = [
     'SOLUSDT', 'LTCUSDT', 'BCHUSDT', 'DOGEUSDT', 'ZECUSDT'
 ]
 
+# Deixa o sistema rodar direto a cada carregamento limpo
 LIMITE_ALERTA_PERCENTUAL = 0.001
 
 if 'precos_anteriores' not in st.session_state:
@@ -131,6 +132,4 @@ if dados_precos and df_cripto is not None:
                     use_container_width=True,
                     hide_index=True
                 )
-
-time.sleep(60)
-st.rerun()
+# CORREÇÃO CRÍTICA: Removido o loop que travava o servidor em segundo plano
