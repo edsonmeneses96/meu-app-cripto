@@ -16,7 +16,6 @@ MOEDAS_MONITORADAS = [
     'SOLUSDT', 'LTCUSDT', 'BCHUSDT', 'DOGEUSDT', 'ZECUSDT'
 ]
 
-# Deixa o sistema rodar direto a cada carregamento limpo
 LIMITE_ALERTA_PERCENTUAL = 0.001
 
 if 'precos_anteriores' not in st.session_state:
@@ -26,6 +25,7 @@ def enviar_mensagem_telegram(mensagem):
     if not TELEGRAM_TOKEN:
         return False
     url = f"https://telegram.org{TELEGRAM_TOKEN}/sendMessage"
+    # CORREÇÃO: Trocado 'message' por 'mensagem' para bater com o comando correto
     payload = {
         "chat_id": str(TELEGRAM_CHAT_ID),
         "text": mensagem,
@@ -132,4 +132,6 @@ if dados_precos and df_cripto is not None:
                     use_container_width=True,
                     hide_index=True
                 )
-# CORREÇÃO CRÍTICA: Removido o loop que travava o servidor em segundo plano
+
+time.sleep(60)
+st.rerun()
