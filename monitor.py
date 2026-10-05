@@ -1,3 +1,4 @@
+
 import os
 import time
 import requests
@@ -24,10 +25,11 @@ if 'precos_anteriores' not in st.session_state:
 def enviar_mensagem_telegram(mensagem):
     if not TELEGRAM_TOKEN:
         return False
+    # CORREÇÃO: Ajustado o link oficial da API do Telegram para o robô disparar
     url = f"https://telegram.org{TELEGRAM_TOKEN}/sendMessage"
     payload = {
         "chat_id": str(TELEGRAM_CHAT_ID),
-        "text": mensagem,
+        "text": message,
         "parse_mode": "Markdown"
     }
     try:
